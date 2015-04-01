@@ -1,1 +1,15 @@
-﻿<Properties StartupItem="ML/ML.csproj" />
+﻿<Properties StartupItem="ML/ML.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ML/NeuralNetwork.cs">
+    <Files>
+      <File FileName="ML/Program.cs" Line="23" Column="23" />
+      <File FileName="ML/Neuralnetwork/Neuron.cs" Line="3" Column="3" />
+      <File FileName="ML/Util.cs" Line="50" Column="50" />
+      <File FileName="ML/NeuralNetwork.cs" Line="3" Column="3" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
