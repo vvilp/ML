@@ -4,13 +4,12 @@ namespace ML
 {
 	public static class Util
 	{
-//		public Util ()
-//		{
-//		}
-
+		static Random random;
 		public static double RandomDouble(double min, double max)
 		{
-			Random random = new Random();
+			if (random == null) {
+				random = new Random();
+			}
 			return random.NextDouble() * (max - min) + min;
 		}
 	}
