@@ -15,7 +15,7 @@ namespace ML
 
 		static void NeuralnetworkTest2()
 		{
-			string[] lines = System.IO.File.ReadAllLines(@"/Volumes/Macintosh HD New/Project/ML/ML/test_data/test5.txt");
+			string[] lines = System.IO.File.ReadAllLines(@"../../test_data/test5.txt");
 
 			double[][] inputArr = new double[lines.Length][];
 			double[][] targetArr = new double[lines.Length][];
