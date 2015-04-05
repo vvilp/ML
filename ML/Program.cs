@@ -15,7 +15,7 @@ namespace ML
 
 		static void NeuralnetworkTest2()
 		{
-			string[] lines = System.IO.File.ReadAllLines(@"/Volumes/Macintosh HD New/Project/ML/ML/test_data/test3.txt");
+			string[] lines = System.IO.File.ReadAllLines(@"/Volumes/Macintosh HD New/Project/ML/ML/test_data/test5.txt");
 
 			double[][] inputArr = new double[lines.Length][];
 			double[][] targetArr = new double[lines.Length][];
@@ -44,7 +44,7 @@ namespace ML
 				targetArr [i] = eachTarget;
 			}
 
-			NeuralNet nn = new NeuralNet (inputArr, targetArr, 1, 2);
+			NeuralNet nn = new NeuralNet (inputArr, targetArr, 0.05, 20);
 			nn.TrainingProcess ();
 		}
 
@@ -52,6 +52,7 @@ namespace ML
 		{
 
 			NeuralnetworkTest2 ();
+			//Util.WriteArray (new double[]{0.1,0.12312321321});
 		}
 	}
 }

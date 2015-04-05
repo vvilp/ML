@@ -63,8 +63,8 @@ namespace ML
 
 	public class NeuralNet
 	{
-		private double[][] trainingData;
-		private double[][] targetValue;
+		private readonly double[][] trainingData;
+		private readonly double[][] targetValue;
 		private double learningRate;
 		private int hiddenLayerNum;
 		private int hiddenLayerNeuronNum; // for each layer
@@ -95,9 +95,12 @@ namespace ML
 		{
 			int iterationNum = 0;
 			double MSE = 0;
+			bool isWriteDetails = false;
 			while(true){
 				for (int indexData = 0; indexData < trainingData.Length; indexData++) {
-					Console.Write("Input data : {0} | target : {1} | output: ", string.Join(",", trainingData[indexData]), string.Join(",", targetValue[indexData]));
+
+					if(isWriteDetails)Console.Write("Input data : {0,-13} | target : {1,-10} | output: ", string.Join(",", trainingData[indexData]), string.Join(",", targetValue[indexData]));
+
 
 					double[] HlayerOutputs = new double[hiddenLayer.NeuronList.Count];
 					for (int i = 0; i < hiddenLayer.NeuronList.Count; i++) {
@@ -110,7 +113,8 @@ namespace ML
 					for (int i = 0; i < outputLayer.NeuronList.Count; i++) {
 						double output = outputLayer.NeuronList [i].UpdateInOutPut (HlayerOutputs);
 						OlayerOutputs [i] = output;
-						Console.Write(output + " ");
+						if(isWriteDetails)Console.Write("{0" +
+							":0.00} ", output);
 					}
 
 					double []deltaO = new double[outputLayer.NeuronList.Count];
@@ -146,22 +150,21 @@ namespace ML
 					}
 					MSEI = MSEI / OlayerOutputs.Length;
 					MSE += MSEI;
-					Console.WriteLine ("MSEI : " + MSEI);
+					if(isWriteDetails)Console.WriteLine ("MSEI : {0:0.0000} ", MSEI);
+				}
+				isWriteDetails = false;
+				MSE = MSE / trainingData.Length;
 
-					//Console.WriteLine ();
+				if(iterationNum % 1000 == 0) {
+					Console.WriteLine ();
+					Console.WriteLine ("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
 
+					isWriteDetails = true;
+					Console.Read ();
 				}
 
-				Console.WriteLine ("MSE : " + MSE / trainingData.Length);
 				MSE = 0;
 				iterationNum++;
-				if(iterationNum % 50 == 0) {
-					Console.WriteLine ("iterationNum : " + iterationNum);
-					Console.WriteLine ();
-					Console.Read ();
-
-				}
-
 			}
 		}
 	}
