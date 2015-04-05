@@ -45,7 +45,7 @@ namespace ML
 			}
 
 			NeuralNet nn = new NeuralNet (inputArr, targetArr, 0.05, 20);
-			nn.TrainingProcess ();
+			nn.TrainingProcess (true);
 		}
 
 		public static void Main (string[] args)
