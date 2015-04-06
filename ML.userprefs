@@ -1,12 +1,12 @@
 ﻿<Properties StartupItem="ML/ML.csproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ML/NeuralNetwork.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ML/CrossValidate.cs">
     <Files>
-      <File FileName="ML/Program.cs" Line="1" Column="1" />
-      <File FileName="ML/Util.cs" Line="1" Column="1" />
-      <File FileName="ML/DataSplitter.cs" Line="1" Column="1" />
-      <File FileName="ML/Data.cs" Line="1" Column="1" />
-      <File FileName="ML/NeuralNetwork.cs" Line="33" Column="33" />
+      <File FileName="ML/Program.cs" Line="57" Column="53" />
+      <File FileName="ML/Util.cs" Line="42" Column="22" />
+      <File FileName="ML/Data.cs" Line="105" Column="45" />
+      <File FileName="ML/NeuralNetwork.cs" Line="207" Column="5" />
+      <File FileName="ML/CrossValidate.cs" Line="40" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
