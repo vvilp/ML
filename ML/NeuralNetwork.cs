@@ -7,15 +7,8 @@ namespace ML
 	public class Neuron
 	{
 		public double[] Weight { get; set; }
-
 		public double[] Input { get; set; }
-
 		public double Output { get; set; }
-
-		private double Sigmoid(double x)
-		{
-			return 1.0 / (1.0 + Math.Pow(Math.E, -x));
-		}
 
 		public Neuron(int numInput)
 		{
@@ -29,6 +22,11 @@ namespace ML
 
 		public double UpdateInOutPut(double[] Input)
 		{
+            if (Input == null)
+            {
+                return Double.MinValue;
+            }
+                
 			this.Input = Input;
 			double res = 0;
 			for (int i = 0; i < Input.Length; i++)
@@ -36,7 +34,7 @@ namespace ML
 				res += Weight[i] * Input[i];
 			}
 			res += Weight[Input.Length];
-			res = Sigmoid(res);
+			res = Util.Sigmoid(res);
 			Output = res;
 			return res;
 		}
@@ -71,7 +69,7 @@ namespace ML
 	public class NeuralNet
 	{
 		private readonly double[][] trainingData;
-		private readonly double[][] targetValue;
+        private readonly double[][] targetValue; // {0,1,2} -> {{1,0,0},{0,1,0},{0,0,1}}
 		private double learningRate;
 		private int hiddenLayerNum;
 		private int hiddenLayerNeuronNum;
@@ -80,21 +78,26 @@ namespace ML
 		private NeuronLayer hiddenLayer;
 		private NeuronLayer outputLayer;
 
-		private double Sigmoid(double x)
-		{
-			return 1.0 / (1.0 + Math.Pow(Math.E, -x));
-		}
 
-		public NeuralNet(double[][] trainingData, double[][] targetValue, double learningRate, int hiddenLayerNum = 1, int hiddenLayerNeuronNum = 2)
+		public NeuralNet(double[][] trainingInput, int[] trainingTarget, double learningRate, int hiddenLayerNum = 1, int hiddenLayerNeuronNum = 2)
 		{
-			this.trainingData = trainingData;
-			this.targetValue = targetValue;
+			this.trainingData = trainingInput;
+            this.targetValue = new double[trainingInput.Length][];
 			this.learningRate = learningRate;
 			this.hiddenLayerNum = hiddenLayerNum;
 			this.hiddenLayerNeuronNum = hiddenLayerNeuronNum;
-			this.outputNeuronNum = targetValue[0].Length;
 
-			hiddenLayer = new NeuronLayer(this.hiddenLayerNeuronNum, trainingData[0].Length);
+            HashSet<int> targetSet= new HashSet<int>(trainingTarget);
+            for (int i = 0; i < trainingTarget.Length; i++)
+            {
+                double [] eachTarget = new double[targetSet.Count];
+                eachTarget[trainingTarget[i]] = 1;
+                targetValue[i] = eachTarget;
+            }
+
+            this.outputNeuronNum = targetSet.Count;
+
+			hiddenLayer = new NeuronLayer(this.hiddenLayerNeuronNum, trainingInput[0].Length);
 			outputLayer = new NeuronLayer(outputNeuronNum, this.hiddenLayerNeuronNum); // single output
 		}
 
@@ -104,6 +107,7 @@ namespace ML
 			double MSE = 0;
 			while (true)
 			{
+                iterationNum++;
 				for (int indexData = 0; indexData < trainingData.Length; indexData++)
 				{
 					string debugStr = "";
@@ -175,7 +179,7 @@ namespace ML
 					if (isDebug)
 					{
 						debugStr += String.Format("MSEI : {0:0.0000} ", MSEI);
-						Debug.WriteLine(debugStr);
+                        Console.WriteLine(debugStr);
 					}
                     
 
@@ -184,19 +188,55 @@ namespace ML
 
 				if (isDebug)
 				{
-					Debug.WriteLine("MSE : " + MSE);
+                    Console.WriteLine("MSE : " + MSE);
 				}
 
-				if (iterationNum % 100 == 0)
-				{
-					Debug.WriteLine("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
-					//Console.Read();
-				}
+                if (iterationNum % 500 == 0)
+                {
+                    //Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
+                    //Console.Read();
+                }
+
+                if (MSE < 0.02 || iterationNum == 50000)
+                {
+                    Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}, Training  Process Finish", iterationNum, MSE);
+                    break;
+                }
 
 				MSE = 0;
-				iterationNum++;
+				
 			}
 		}
+
+        public int Classify(double[] input)
+        {
+            double[] HlayerOutputs = new double[hiddenLayer.NeuronList.Count];
+            for (int i = 0; i < hiddenLayer.NeuronList.Count; i++)
+            {
+                double output = hiddenLayer.NeuronList[i].UpdateInOutPut(input);
+                HlayerOutputs[i] = output;
+            }
+
+            double[] OlayerOutputs = new double[outputLayer.NeuronList.Count];
+            for (int i = 0; i < outputLayer.NeuronList.Count; i++)
+            {
+                double output = outputLayer.NeuronList[i].UpdateInOutPut(HlayerOutputs);
+                OlayerOutputs[i] = output;
+            }
+
+            int maxIndex = 0;
+            double max = Double.MinValue;
+            for (int i = 0; i < OlayerOutputs.Length; i++)
+            {
+                if (max < OlayerOutputs[i])
+                {
+                    maxIndex = i;
+                    max = OlayerOutputs[i];
+                }
+            }
+
+            return maxIndex;
+        }
 	}
 }
 
