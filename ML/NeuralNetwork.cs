@@ -193,7 +193,7 @@ namespace ML
 
                 if (iterationNum % 500 == 0)
                 {
-                    //Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
+                    Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
                     //Console.Read();
                 }
 

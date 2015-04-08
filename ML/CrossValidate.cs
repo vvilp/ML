@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ML
 {
@@ -7,12 +8,13 @@ namespace ML
         private Data data;
         private double trainingSize;
         private int validationRounds;
-
-        public CrossValidate(double trainingSize, int validationRounds)
+        private int foldsNum;
+        public CrossValidate(double trainingSize, int validationRounds, int foldsNum)
         {
             data = new Data();
             this.trainingSize = trainingSize;
             this.validationRounds = validationRounds;
+            this.foldsNum = foldsNum;
         }
 
         public void ReadData(string path, char splitChar)
@@ -27,35 +29,54 @@ namespace ML
 
         public void StartValidation()
         {
-            double avgCorrectRate = 0;
+            //double avgCorrectRate = 0;
             for (int ri = 0; ri < validationRounds; ri++)
             {
-                data.SplitData(trainingSize);
-                double[][] trainingInput = data.GetTrainingInput();
-                int[] trainingTarget = data.GetTrainingTarget();
+                //data.SplitData(trainingSize);
+                double[][] trainingInput = data.Input;
+                int[] trainingTarget = data.Target;
 
                 NeuralNet nn = new NeuralNet(trainingInput, trainingTarget, 0.005, 20);
                 nn.TrainingProcess(false);
 
-                double[][] testInput = data.GetTestInput();
-                int[] testTarget = data.GetTestTarget();
-                int correctNum = 0;
-                for (int i = 0; i < testInput.Length; i++)
+
+                List<List<int>> indexList = data.GetIndexInFolds(foldsNum);
+
+                foreach (List<int> indexs in indexList)
                 {
-                    int result = nn.Classify(testInput[i]);
-                    //Console.WriteLine("Test input:{0} | Target class:{1} | OutPut class:{2}", string.Join(",", testInput[i]),testTarget[i], result);
-                    if (result == testTarget[i])
+                    int correctNum = 0;
+                    foreach (int index in indexs)
                     {
-                        correctNum++;
+                        int result = nn.Classify(trainingInput[index]);
+                        if (result == trainingTarget[index])
+                        {
+                            correctNum++;
+                        }
+                        //Console.WriteLine("Test input:{0} | Target class:{1} | OutPut class:{2}", string.Join(",", trainingInput[index]),trainingTarget[index], result);
                     }
+                    double CorrectRate = (double)correctNum / (double)indexs.Count;
+                    Console.WriteLine("CorrectRate:" + CorrectRate);
                 }
 
-                double CorrectRate = (double)correctNum / (double)testInput.Length;
-                Console.WriteLine("CorrectRate:" + CorrectRate);
-                avgCorrectRate += CorrectRate;
+//                double[][] testInput = data.GetTestInput();
+//                int[] testTarget = data.GetTestTarget();
+//                int correctNum = 0;
+//                for (int i = 0; i < testInput.Length; i++)
+//                {
+//                    int result = nn.Classify(testInput[i]);
+//                    //Console.WriteLine("Test input:{0} | Target class:{1} | OutPut class:{2}", string.Join(",", testInput[i]),testTarget[i], result);
+//                    if (result == testTarget[i])
+//                    {
+//                        correctNum++;
+//                    }
+//                }
+//
+//                double CorrectRate = (double)correctNum / (double)testInput.Length;
+//                Console.WriteLine("CorrectRate:" + CorrectRate);
+//                avgCorrectRate += CorrectRate;
             }
-            avgCorrectRate = avgCorrectRate / validationRounds;
-            Console.WriteLine("Average Correct Rate:" + avgCorrectRate);
+//            avgCorrectRate = avgCorrectRate / validationRounds;
+//            Console.WriteLine("Average Correct Rate:" + avgCorrectRate);
         }
     }
 }
