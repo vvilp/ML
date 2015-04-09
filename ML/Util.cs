@@ -43,6 +43,7 @@ namespace ML
         {
             return 1.0 / (1.0 + Math.Pow(Math.E, -x));
         }
+//test
     }
 }
 
