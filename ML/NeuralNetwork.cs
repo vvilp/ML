@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ML
 {
@@ -207,6 +208,153 @@ namespace ML
 				
 			}
 		}
+
+        public void TrainingProcessParallelTest(bool isDebug = false)
+        {
+            int iterationNum = 0;
+            double MSE = 0;
+            while (true)
+            {
+                iterationNum++;
+                Parallel.For(0, trainingData.Length, indexData =>
+                //for (int indexData = 0; indexData < trainingData.Length; indexData++)
+                {
+                    string debugStr = "";
+                    if (isDebug)
+                    {
+                        debugStr = String.Format("Input data : {0,-13} | target : {1,-10} | output: ", string.Join(",", trainingData[indexData]), string.Join(",", targetValue[indexData]));
+                    }
+
+                    // forward
+                    double[] HlayerOutputs = new double[hiddenLayer.NeuronList.Count];
+                    for (int i = 0; i < hiddenLayer.NeuronList.Count; i++)
+                    {
+                        double output = hiddenLayer.NeuronList[i].UpdateInOutPut(trainingData[indexData]);
+                        HlayerOutputs[i] = output;
+                    }
+                    //Parallel.For(0, hiddenLayer.NeuronList.Count, i =>
+                    //{
+                    //    double output = hiddenLayer.NeuronList[i].UpdateInOutPut(trainingData[indexData]);
+                    //    HlayerOutputs[i] = output;
+                    //});
+
+
+                    double[] OlayerOutputs = new double[outputLayer.NeuronList.Count];
+                    for (int i = 0; i < outputLayer.NeuronList.Count; i++)
+                    {
+                        double output = outputLayer.NeuronList[i].UpdateInOutPut(HlayerOutputs);
+                        OlayerOutputs[i] = output;
+                        if (isDebug)
+                        {
+                            debugStr += String.Format("{0:0.00} ", output);
+                        }
+                    }
+                    //Parallel.For(0, outputLayer.NeuronList.Count, i =>
+                    //{
+                    //    double output = outputLayer.NeuronList[i].UpdateInOutPut(HlayerOutputs);
+                    //    OlayerOutputs[i] = output;
+                    //    if (isDebug)
+                    //    {
+                    //        debugStr += String.Format("{0:0.00} ", output);
+                    //    }
+                    //});
+
+                    // backpropagation
+                    double[] deltaO = new double[outputLayer.NeuronList.Count];
+                    for (int i = 0; i < outputLayer.NeuronList.Count; i++)
+                    {
+                        double o = OlayerOutputs[i];
+                        double t = targetValue[indexData][i];
+                        deltaO[i] = o * (1 - o) * (o - t);
+                    }
+                    //Parallel.For(0, outputLayer.NeuronList.Count, i =>
+                    //{
+                    //    double o = OlayerOutputs[i];
+                    //    double t = targetValue[indexData][i];
+                    //    deltaO[i] = o * (1 - o) * (o - t);
+                    //});
+
+                    double[] deltaH = new double[hiddenLayer.NeuronList.Count];
+                    for (int i = 0; i < hiddenLayer.NeuronList.Count; i++)
+                    {
+                        double deltaTemp = 0;
+                        for (int j = 0; j < outputLayer.NeuronList.Count; j++)
+                        {
+                            deltaTemp += deltaO[j] * outputLayer.NeuronList[j].Weight[i];
+                        }
+                        double o = HlayerOutputs[i];
+                        deltaH[i] = o * (1 - o) * deltaTemp;
+                    }
+                    //Parallel.For(0, hiddenLayer.NeuronList.Count, i =>
+                    //{
+                    //    double deltaTemp = 0;
+                    //    for (int j = 0; j < outputLayer.NeuronList.Count; j++)
+                    //    {
+                    //        deltaTemp += deltaO[j] * outputLayer.NeuronList[j].Weight[i];
+                    //    }
+                    //    double o = HlayerOutputs[i];
+                    //    deltaH[i] = o * (1 - o) * deltaTemp;
+                    //});
+
+                    // update w
+                    for (int i = 0; i < outputLayer.NeuronList.Count; i++)
+                    {
+                        outputLayer.NeuronList[i].UpdateWeight(deltaO[i], this.learningRate);
+                    }
+                    //Parallel.For(0, outputLayer.NeuronList.Count, i =>
+                    //{
+                    //    outputLayer.NeuronList[i].UpdateWeight(deltaO[i], this.learningRate);
+                    //});
+
+                    for (int i = 0; i < hiddenLayer.NeuronList.Count; i++)
+                    {
+                        hiddenLayer.NeuronList[i].UpdateWeight(deltaH[i], this.learningRate);
+                    }
+                    //Parallel.For(0, hiddenLayer.NeuronList.Count, i =>
+                    //{
+                    //    hiddenLayer.NeuronList[i].UpdateWeight(deltaH[i], this.learningRate);
+                    //});
+
+                    // Mean squared error
+                    double MSEI = 0;
+                    for (int i = 0; i < OlayerOutputs.Length; i++)
+                    {
+                        double delta = (OlayerOutputs[i] - targetValue[indexData][i]);
+                        MSEI += delta * delta;
+                    }
+                    MSEI = MSEI / OlayerOutputs.Length;
+                    MSE += MSEI;
+                    if (isDebug)
+                    {
+                        debugStr += String.Format("MSEI : {0:0.0000} ", MSEI);
+                        Console.WriteLine(debugStr);
+                    }
+
+
+                });
+                MSE = MSE / trainingData.Length;
+
+                if (isDebug)
+                {
+                    Console.WriteLine("MSE : " + MSE);
+                }
+
+                if (iterationNum % 500 == 0)
+                {
+                    Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}", iterationNum, MSE);
+                    //Console.Read();
+                }
+
+                if (MSE < 0.02 || iterationNum == 50000)
+                {
+                    Console.WriteLine("iterationNum : {0}, MSE : {1:0.0000}, Training  Process Finish", iterationNum, MSE);
+                    break;
+                }
+
+                MSE = 0;
+
+            }
+        }
 
         public int Classify(double[] input)
         {

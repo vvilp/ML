@@ -14,10 +14,9 @@ namespace ML
 
 		public static void Main (string[] args)
 		{
-//            CrossValidate cv = new CrossValidate(0.7, 5, 5);
-//            cv.ReadData(@"../../test_data/test6.txt", '\t');
-//            cv.StartValidation();
-            Console.WriteLine("asd");
+            CrossValidate cv = new CrossValidate(0.7, 5, 5);
+            cv.ReadData(@"../../test_data/test5.txt", '\t');
+            cv.StartValidation();
 		}
 	}
 }
