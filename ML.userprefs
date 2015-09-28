@@ -5,7 +5,8 @@
       <File FileName="ML/Data.cs" Line="1" Column="1" />
       <File FileName="ML/NeuralNetwork.cs" Line="1" Column="1" />
       <File FileName="ML/CrossValidate.cs" Line="1" Column="1" />
-      <File FileName="ML/Program.cs" Line="26" Column="1" />
+      <File FileName="ML/Program.cs" Line="20" Column="1" />
+      <File FileName="ML/Util.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
